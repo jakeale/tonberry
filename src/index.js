@@ -1,3 +1,3 @@
-import scrape from "./scrape.js";
+import { scrapeStatusPage } from "./scrape.js";
 
-scrape();
+scrapeStatusPage();

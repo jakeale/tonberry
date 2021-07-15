@@ -1,26 +1,29 @@
 import fetch from "node-fetch";
 import cheerio from "cheerio";
 
+/**
+ * Fetches the server status page.
+ * @returns The fetch response if it was successful.
+ */
 async function checkStatus() {
   return await fetch(
     "https://na.finalfantasyxiv.com/lodestone/worldstatus/"
-  ).then(isOk);
-
-  function isOk(resp) {
+  ).then((resp) => {
     if (resp.ok) {
       return resp;
     } else {
-      console.log("something went wrong");
+      throw Error("Couldn't fetch world status page.");
     }
-  }
+  });
 }
 
 /**
- * Parses a server list element and retrieves relevant attributes
+ * Parses a server list element and retrieves relevant attributes.
  * @param {CheerioAPI} $
  * @param {Element} server
+ * @returns Object containing a particular server's status information
  */
-async function getServerInfo($, server) {
+function getServerInfo($, server) {
   const name = $(server).find(".world-list__world_name").find("p").text();
 
   const category = $(server)
@@ -28,29 +31,38 @@ async function getServerInfo($, server) {
     .find("p")
     .text();
 
-  const icon = $(server)
+  const status = $(server)
     .find(".world-list__status_icon")
     .find("i")
     .attr("data-tooltip")
     .trim();
+
+  return { name: name, status: status, category: category };
 }
 
-export default async function scrape() {
+/**
+ * Scrapes the FFXIV Server Status page using Cheerio.
+ * @returns Object containing server status information
+ */
+export async function scrapeStatusPage() {
+  let server_obj = {};
+
   const resp = await checkStatus();
 
   const $ = cheerio.load(await resp.text());
 
-  const dataCenters = $("div .js--tab-content");
+  // Information for each server is nested in an
+  // <li> element named `item-list`
+  const servers = $("li .item-list");
 
-  dataCenters.each((i, e) => {
-    const dataCenter = $(e).find(".world-dcgroup__item");
+  servers.each((i, e) => {
+    const server = getServerInfo($, e);
 
-    dataCenter.each((i, e) => {
-      const server = $(e).find(".item-list");
-
-      server.each((i, e) => {
-        getServerInfo($, e);
-      });
-    });
+    server_obj[server.name] = {
+      status: server.status,
+      category: server.category,
+    };
   });
+
+  return server_obj;
 }
