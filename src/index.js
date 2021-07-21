@@ -1,3 +1,3 @@
-import { scrapeStatusPage } from "./scrape.js";
+import { scrapeStatusPage } from './scrape.js';
 
-scrapeStatusPage();
+console.log(await scrapeStatusPage());

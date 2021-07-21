@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "description": "",
-  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./src/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +13,7 @@
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.12",
+    "prettier": "^2.3.2"
   }
 }
