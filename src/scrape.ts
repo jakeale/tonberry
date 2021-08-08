@@ -15,7 +15,7 @@ export interface Servers {
  * Fetches the server status page.
  * @returns The fetch response if it was successful.
  */
-async function getStatus() {
+async function fetchStatus() {
   const resp = await fetch(
     'https://na.finalfantasyxiv.com/lodestone/worldstatus/'
   );
@@ -24,9 +24,7 @@ async function getStatus() {
     return resp;
   }
 
-  throw new Error(
-    `Could not fetch world status page. Reason: ${resp.statusText}`
-  );
+  throw new Error(`Could not fetch world status page. Reason: ${resp.status}`);
 }
 
 /**
@@ -65,16 +63,12 @@ function getServerInfo($: cheerio.Root, server: cheerio.Element): Server {
  * Scrapes the FFXIV Server Status page using Cheerio.
  * @returns Object containing server status information
  */
-export async function scrapeStatusPage() {
+export async function scrapeStatuses() {
   const servers: Servers = {};
-  let $: cheerio.Root;
 
-  try {
-    const resp = await getStatus();
-    $ = cheerio.load(await resp.text());
-  } catch (error) {
-    return {};
-  }
+  const resp = await fetchStatus();
+
+  const $ = cheerio.load(await resp.text());
 
   // Information for each server is nested in an
   // <li> element named `item-list`
