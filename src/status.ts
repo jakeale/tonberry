@@ -1,23 +1,25 @@
-import { scrapeStatus, Servers } from './scrape';
+import { scrapeStatus, Servers } from './scrape.js';
 import { diff } from 'deep-object-diff';
-import { isEmpty } from './utils';
+import { isEmpty } from './utils.js';
 
 export class ServerStatusRefresher {
   servers: Servers = {};
   prev_servers: Servers = {};
 
-  constructor() {
-    this.start();
-  }
-
-  getServers() {
-    return this.servers;
+  /**
+   * Makeshift async constructor
+   * @returns New instance of refresher
+   */
+  static async create() {
+    const refresher = new ServerStatusRefresher();
+    await refresher.init();
+    return refresher;
   }
 
   /**
    * Start continuously refreshing the server status every 30 seconds
    */
-  async start() {
+  async init() {
     this.servers = await scrapeStatus();
     this.prev_servers = this.servers;
     setInterval(this.refresh.bind(this), 30000);
@@ -29,13 +31,13 @@ export class ServerStatusRefresher {
   async refresh() {
     try {
       this.servers = await scrapeStatus();
-
-      checkDiff(this.prev_servers, this.servers);
-
-      this.prev_servers = this.servers;
     } catch (e) {
       console.error(e);
     }
+
+    checkDiff(this.prev_servers, this.servers);
+
+    this.prev_servers = this.servers;
   }
 }
 /**

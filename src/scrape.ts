@@ -72,7 +72,7 @@ export async function scrapeStatus() {
 
   // Information for each server is nested in an
   // <li> element named `item-list`
-  $('li .item-list').each((i, e: cheerio.Element) => {
+  $('li .item-list').each((_i: number, e: cheerio.Element) => {
     const name: string = $(e)
       .find('div .world-list__world_name')
       .find('p')
