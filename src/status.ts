@@ -1,4 +1,4 @@
-import { scrapeStatus, Servers } from './scrape.js';
+import { scrapeServerStatus, Servers } from './scrape.js';
 import { diff } from 'deep-object-diff';
 import { isEmpty } from './utils.js';
 
@@ -20,7 +20,7 @@ export class ServerStatusRefresher {
    * Start continuously refreshing the server status every 30 seconds
    */
   async init() {
-    this.servers = await scrapeStatus();
+    this.servers = await scrapeServerStatus();
     this.prev_servers = this.servers;
     setInterval(this.refresh.bind(this), 30000);
   }
@@ -30,7 +30,7 @@ export class ServerStatusRefresher {
    */
   async refresh() {
     try {
-      this.servers = await scrapeStatus();
+      this.servers = await scrapeServerStatus();
     } catch (e) {
       console.error(e);
     }

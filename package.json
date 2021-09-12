@@ -1,17 +1,18 @@
 {
-  "name": "tonberry-bot",
+  "name": "tonberry",
   "version": "1.0.0",
   "type": "module",
   "description": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jakeale/tonberry-bot"
+    "url": "https://github.com/jakeale/tonberry"
   },
   "scripts": {
     "watch": "npx tsc -w",
     "dev": "nodemon dist/index.js",
     "build": "npx tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -19,12 +20,15 @@
     "cheerio": "^1.0.0-rc.10",
     "deep-object-diff": "^1.1.0",
     "discord.js": "^13.0.1",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "ts-jest": "^27.0.5"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.30",
+    "@types/jest": "^27.0.1",
     "@types/node": "^16.4.13",
     "@types/node-fetch": "^2.5.12",
+    "jest": "^27.1.1",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
     "typescript": "^4.3.5"

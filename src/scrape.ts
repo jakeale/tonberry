@@ -63,7 +63,7 @@ function getServerInfo($: cheerio.Root, server: cheerio.Element): Server {
  * Scrapes the FFXIV Server Status page using Cheerio.
  * @returns Object containing server status information
  */
-export async function scrapeStatus() {
+export async function scrapeServerStatus() {
   const servers: Servers = {};
 
   const resp = await fetchStatus();
