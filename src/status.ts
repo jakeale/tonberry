@@ -50,8 +50,5 @@ const checkDiff = (prev: Servers, current: Servers) => {
 
   // If there's a difference, signal for bot message to be sent
   if (!isEmpty(status_diff)) {
-    signal(status_diff);
   }
 };
-
-const signal = async (diff: object) => {};

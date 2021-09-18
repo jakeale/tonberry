@@ -4,7 +4,7 @@ import cheerio from 'cheerio';
 interface Server {
   status: string;
   category: string;
-  character_creation_status: string;
+  characterCreationStatus: string;
 }
 
 export interface Servers {
@@ -47,7 +47,7 @@ function getServerInfo($: cheerio.Root, server: cheerio.Element): Server {
     .attr('data-tooltip')!
     .trim();
 
-  const character_creation_status: string = selector
+  const characterCreationStatus: string = selector
     .find('div .world-list__create_character')
     .find('i')
     .attr('data-tooltip')!;
@@ -55,7 +55,7 @@ function getServerInfo($: cheerio.Root, server: cheerio.Element): Server {
   return {
     status: status,
     category: category,
-    character_creation_status: character_creation_status,
+    characterCreationStatus: characterCreationStatus,
   };
 }
 

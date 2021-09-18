@@ -1,8 +1,3 @@
-import { ServerStatusRefresher } from './status.js';
-import { Client } from 'discord.js';
+const main = async () => {};
 
-const start = async () => {
-  const refresher = await ServerStatusRefresher.create();
-};
-
-start();
+main();
