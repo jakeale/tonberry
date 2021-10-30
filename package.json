@@ -20,14 +20,14 @@
     "axios": "^0.24.0",
     "cheerio": "^1.0.0-rc.10",
     "deep-object-diff": "^1.1.0",
-    "discord.js": "^13.0.1",
+    "redis": "^4.0.0-rc.3",
     "ts-jest": "^27.0.5"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.30",
     "@types/jest": "^27.0.1",
     "@types/node": "^16.4.13",
-    "@types/node-fetch": "^2.5.12",
+    "@types/redis": "^2.8.32",
     "jest": "^27.1.1",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
