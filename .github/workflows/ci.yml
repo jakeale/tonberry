@@ -33,9 +33,10 @@ jobs:
     container: node:16-alpine
 
     services:
-      image: redis:6.2.6
-      ports:
-        - 6379: 6379
+      redis:
+        image: redis:6.2.6
+        ports:
+          - 6379: 6379
 
     steps:
       - uses: actions/checkout@v2
