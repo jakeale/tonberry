@@ -1,5 +1,5 @@
-import fetch from 'node-fetch';
 import cheerio from 'cheerio';
+import axios, { AxiosResponse } from 'axios';
 
 interface Server {
   status: string;
@@ -15,17 +15,18 @@ export interface Servers {
  * Fetches the server status page.
  * @returns The fetch response if it was successful.
  */
-async function fetchStatus() {
-  const resp = await fetch(
-    'https://na.finalfantasyxiv.com/lodestone/worldstatus/'
+const fetchStatus = async (): Promise<AxiosResponse<any, any>> => {
+  const resp = await axios.get(
+    'https://na.finalfantasyxiv.com/lodestone/worldstatus/',
+    { responseType: 'text' }
   );
 
-  if (resp.ok) {
+  if (resp.status === 200) {
     return resp;
   }
 
   throw new Error(`Could not fetch world status page. Reason: ${resp.status}`);
-}
+};
 
 /**
  * Parses a server <li> element and retrieves relevant attributes.
@@ -33,7 +34,7 @@ async function fetchStatus() {
  * @param {cheerio.Root} $
  * @returns Object containing a particular server's status information
  */
-function getServerInfo($: cheerio.Root, server: cheerio.Element): Server {
+const getServerInfo = ($: cheerio.Root, server: cheerio.Element): Server => {
   const selector: cheerio.Cheerio = $(server);
 
   const category: string = selector
@@ -57,18 +58,18 @@ function getServerInfo($: cheerio.Root, server: cheerio.Element): Server {
     category: category,
     characterCreationStatus: characterCreationStatus,
   };
-}
+};
 
 /**
  * Scrapes the FFXIV Server Status page using Cheerio.
  * @returns Object containing server status information
  */
-export async function scrapeServerStatus() {
+export const scrapeServerStatus = async () => {
   const servers: Servers = {};
 
   const resp = await fetchStatus();
 
-  const $ = cheerio.load(await resp.text());
+  const $ = cheerio.load(resp.data);
 
   // Information for each server is nested in an
   // <li> element named `item-list`
@@ -82,4 +83,4 @@ export async function scrapeServerStatus() {
   });
 
   return servers;
-}
+};
