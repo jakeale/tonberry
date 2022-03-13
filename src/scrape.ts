@@ -7,15 +7,11 @@ interface Server {
   characterCreationStatus: string;
 }
 
-interface DataCentre {
-  [name: string]: Server;
-}
-
 /**
- * Object that maps names of data centres to their servers
+ * Object that maps names of data centres to an object containing their servers
  */
 interface Servers {
-  [name: string]: DataCentre;
+  [dataCentreName: string]: { [serverName: string]: Server };
 }
 
 /**
