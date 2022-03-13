@@ -1,6 +1,6 @@
 import { scrapeServerStatus } from '../scrape';
 
-test('Scrape server status from Lodestone', async () => {
+test('Server status information is present for each server', async () => {
   const servers = await scrapeServerStatus();
 
   const expected_server = {
@@ -11,7 +11,9 @@ test('Scrape server status from Lodestone', async () => {
     status: expect.stringMatching(/Online|Offline/),
   };
 
-  Object.values(servers).forEach((server) => {
-    expect(server).toMatchObject(expected_server);
+  Object.values(servers).forEach((dataCentre) => {
+    Object.values(dataCentre).forEach((server) => {
+      expect(server).toMatchObject(expected_server);
+    });
   });
 });
