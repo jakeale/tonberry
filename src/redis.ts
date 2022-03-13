@@ -1,9 +1,9 @@
 import { createClient } from 'redis';
 
-export const startRedis = async () => {
+export async function startRedis() {
   const client = await createClient();
 
   await client.connect();
 
   return client;
-};
+}
