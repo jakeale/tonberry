@@ -10,7 +10,7 @@ interface Server {
 /**
  * Object that maps names of data centres to an object containing their servers
  */
-interface Servers {
+export interface Servers {
   [dataCentreName: string]: { [serverName: string]: Server };
 }
 
@@ -40,26 +40,17 @@ async function fetchStatus(): Promise<AxiosResponse<any, any>> {
 function getServerInfo($: cheerio.Root, server: cheerio.Element): Server {
   const selector: cheerio.Cheerio = $(server).parent();
 
-  const category: string = selector
-    .find('div .world-list__world_category')
-    .find('p')
-    .text();
-
-  const status: string = selector
-    .find('div .world-list__status_icon')
-    .find('i')
-    .attr('data-tooltip')!
-    .trim();
-
-  const characterCreationStatus: string = selector
-    .find('div .world-list__create_character')
-    .find('i')
-    .attr('data-tooltip')!;
-
   return {
-    status: status,
-    category: category,
-    characterCreationStatus: characterCreationStatus,
+    status: selector
+      .find('div .world-list__status_icon')
+      .find('i')
+      .attr('data-tooltip')!
+      .trim(),
+    category: selector.find('div .world-list__world_category').find('p').text(),
+    characterCreationStatus: selector
+      .find('div .world-list__create_character')
+      .find('i')
+      .attr('data-tooltip')!,
   };
 }
 
