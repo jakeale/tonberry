@@ -1,3 +1,4 @@
-node_modules
-dist
+/tonberry
+*.out
 .vscode
+.env

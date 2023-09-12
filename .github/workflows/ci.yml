@@ -1,7 +1,8 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# This workflow builds, vets, lints, and tests the Go module, including integration
+# tests that require a live Postgres instance.
+# For more information see: https://github.com/actions/setup-go
 
-name: Node.js CI
+name: Go CI
 
 on:
   push:
@@ -9,35 +10,49 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432/tonberry?sslmode=disable
+
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    
+
     services:
-      redis:
-        image: redis:6.2.6
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: tonberry
         options: >-
-          --health-cmd "redis-cli ping"
+          --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 6379:6379
+          - 5432:5432
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
-          node-version: 16
-          cache: 'npm'
+          go-version: '1.26'
+          cache: true
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Vet
+        run: go vet ./...
+
       - name: Build
-        run: npm run build
+        run: go build ./...
+
       - name: Test
-        run: npm run test
+        run: go test ./...
+
+      - name: Integration test
+        run: go test -tags=integration ./...
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v6
