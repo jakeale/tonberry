@@ -16,14 +16,11 @@ subscribed channels on change, and looks up characters/Free Companies via
 
 - `internal/lodestone` - scrapes the Lodestone world-status page (goquery).
 - `internal/monitor` - polls the scraper, diffs against the previous snapshot in
-  memory, fans out changes. Never touches Postgres.
+  memory, fans out changes.
 - `internal/store` - Postgres subscription persistence (guild/channel/world).
 - `internal/godestone` - wraps `godestone/v2` for character/FC lookups, with a
   short-lived in-memory TTL cache.
 - `internal/discord` - slash commands, interaction handling, embeds, notifier.
-
-Postgres holds only durable subscription data; the world-status snapshot is small
-and ephemeral, so it lives in memory.
 
 ## Configuration
 
@@ -39,7 +36,7 @@ and ephemeral, so it lives in memory.
 
 ## Local development
 
-Requires Go 1.26+, Docker, and a Discord bot token.
+Requires Go 1.21+, Docker, and a Discord bot token.
 
 ```sh
 cp .env.example .env       # fill in DISCORD_TOKEN, DISCORD_APP_ID, DISCORD_GUILD_ID

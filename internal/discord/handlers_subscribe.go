@@ -13,7 +13,7 @@ func (bot *Bot) handleSubscribe(
 	interaction *discordgo.InteractionCreate,
 	data discordgo.ApplicationCommandInteractionData,
 ) {
-	world := data.GetOption(optionWorld).StringValue()
+	world := optionByName(data.Options, optionWorld).StringValue()
 
 	if !isKnownWorld(bot.monitor.Snapshot(), world) {
 		bot.respondEphemeral(session, interaction, fmt.Sprintf("Unknown world %q.", world))
@@ -41,7 +41,7 @@ func (bot *Bot) handleUnsubscribe(
 	interaction *discordgo.InteractionCreate,
 	data discordgo.ApplicationCommandInteractionData,
 ) {
-	world := data.GetOption(optionWorld).StringValue()
+	world := optionByName(data.Options, optionWorld).StringValue()
 
 	existed, err := bot.store.RemoveSubscription(ctx, interaction.GuildID, interaction.ChannelID, world)
 	if err != nil {

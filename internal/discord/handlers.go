@@ -60,6 +60,15 @@ func (bot *Bot) handleAutocomplete(session *discordgo.Session, interaction *disc
 	}
 }
 
+func optionByName(options []*discordgo.ApplicationCommandInteractionDataOption, name string) *discordgo.ApplicationCommandInteractionDataOption {
+	for _, option := range options {
+		if option.Name == name {
+			return option
+		}
+	}
+	return nil
+}
+
 func focusedOption(options []*discordgo.ApplicationCommandInteractionDataOption) *discordgo.ApplicationCommandInteractionDataOption {
 	for _, option := range options {
 		if option.Focused {

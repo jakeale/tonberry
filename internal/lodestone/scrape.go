@@ -71,6 +71,14 @@ func (scraper *Scraper) Scrape(ctx context.Context) (Servers, error) {
 		servers[name] = parseServerStatus(selection)
 	})
 
+	// A 200 response that parses to zero worlds almost always means Lodestone changed
+	// its markup and our selectors no longer match, rather than every world vanishing.
+	// Returning an error here routes the failure through the same path as a network
+	// error, so the monitor preserves its last-known-good snapshot instead of wiping it.
+	if len(servers) == 0 {
+		return nil, fmt.Errorf("parsed zero worlds from world status page (layout may have changed)")
+	}
+
 	return servers, nil
 }
 

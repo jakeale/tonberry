@@ -5,11 +5,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/jakeale/tonberry/internal/config"
 	"github.com/jakeale/tonberry/internal/discord"
@@ -19,6 +19,11 @@ import (
 	"github.com/jakeale/tonberry/internal/monitor"
 	"github.com/jakeale/tonberry/internal/store"
 )
+
+// shutdownTimeout bounds how long run() waits for the status monitor to stop after
+// ctx is canceled. Without a cap, a wedged in-flight refresh/notify would block
+// shutdown indefinitely until the platform force-kills the process.
+const shutdownTimeout = 20 * time.Second
 
 func main() {
 	if err := run(); err != nil {
@@ -50,7 +55,7 @@ func run() error {
 
 	godestoneClient := godestone.NewClient()
 
-	scraper := lodestone.NewScraper(&http.Client{}, cfg.LodestoneURL)
+	scraper := lodestone.NewScraper(nil, cfg.LodestoneURL)
 	statusMonitor := monitor.New(scraper, cfg.PollInterval, logger)
 
 	bot, err := discord.NewBot(cfg.DiscordToken, cfg.DiscordGuildID, subscriptionStore, statusMonitor, godestoneClient, logger)
@@ -84,7 +89,17 @@ func run() error {
 	<-ctx.Done()
 	logger.Info("shutting down")
 
-	wg.Wait()
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		wg.Wait()
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(shutdownTimeout):
+		logger.Warn("shutdown timed out waiting for status monitor to stop", "timeout", shutdownTimeout)
+	}
 
 	return nil
 }

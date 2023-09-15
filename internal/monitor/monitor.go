@@ -16,10 +16,16 @@ import (
 // It is always called with a non-empty slice.
 type ChangeHandler func(ctx context.Context, changes []StatusChange)
 
+// scraper is the subset of *lodestone.Scraper Monitor depends on. Defined here
+// (consumer side) so tests can substitute a fake without a live HTTP server.
+type scraper interface {
+	Scrape(ctx context.Context) (lodestone.Servers, error)
+}
+
 // Monitor holds the current world-status snapshot in memory and notifies handlers
 // when it changes.
 type Monitor struct {
-	scraper  *lodestone.Scraper
+	scraper  scraper
 	interval time.Duration
 	logger   *slog.Logger
 
@@ -32,9 +38,9 @@ type Monitor struct {
 }
 
 // New builds a Monitor that scrapes with the given scraper on the given interval.
-func New(scraper *lodestone.Scraper, interval time.Duration, logger *slog.Logger) *Monitor {
+func New(worldScraper scraper, interval time.Duration, logger *slog.Logger) *Monitor {
 	return &Monitor{
-		scraper:  scraper,
+		scraper:  worldScraper,
 		interval: interval,
 		logger:   logger,
 	}

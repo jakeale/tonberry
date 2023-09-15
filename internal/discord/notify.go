@@ -4,11 +4,17 @@ import (
 	"context"
 	"log/slog"
 	"sync"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/jakeale/tonberry/internal/monitor"
 	"github.com/jakeale/tonberry/internal/store"
 )
+
+// sendTimeout bounds a single channel send. Monitor invokes handlers synchronously,
+// so a send stuck on a network stall would otherwise delay the next poll tick and
+// graceful shutdown indefinitely.
+const sendTimeout = 15 * time.Second
 
 // Notifier delivers world status changes detected by the monitor to every guild
 // channel subscribed to the affected world.
@@ -53,10 +59,14 @@ func (notifier *Notifier) Handle(ctx context.Context, changes []monitor.StatusCh
 
 			for _, subscriber := range subscribers {
 				wg.Add(1)
-				go func(channelID string) {
+				go func(world string, channelID string) {
 					defer wg.Done()
 
-					if _, err := notifier.session.ChannelMessageSendEmbed(channelID, embed); err != nil {
+					sendCtx, cancel := context.WithTimeout(ctx, sendTimeout)
+					defer cancel()
+
+					_, err := notifier.session.ChannelMessageSendEmbed(channelID, embed, discordgo.WithContext(sendCtx))
+					if err != nil {
 						notifier.logger.Error(
 							"send status change notification failed",
 							"world", world,
@@ -64,7 +74,7 @@ func (notifier *Notifier) Handle(ctx context.Context, changes []monitor.StatusCh
 							"error", err,
 						)
 					}
-				}(subscriber.ChannelID)
+				}(world, subscriber.ChannelID)
 			}
 		}
 	}

@@ -15,8 +15,8 @@ func (bot *Bot) handleCharacter(
 	interaction *discordgo.InteractionCreate,
 	data discordgo.ApplicationCommandInteractionData,
 ) {
-	name := data.GetOption(optionName).StringValue()
-	world := data.GetOption(optionWorld).StringValue()
+	name := optionByName(data.Options, optionName).StringValue()
+	world := optionByName(data.Options, optionWorld).StringValue()
 
 	if !bot.deferOrLog(session, interaction) {
 		return
@@ -37,8 +37,8 @@ func (bot *Bot) handleFreeCompany(
 	interaction *discordgo.InteractionCreate,
 	data discordgo.ApplicationCommandInteractionData,
 ) {
-	name := data.GetOption(optionName).StringValue()
-	world := data.GetOption(optionWorld).StringValue()
+	name := optionByName(data.Options, optionName).StringValue()
+	world := optionByName(data.Options, optionWorld).StringValue()
 
 	if !bot.deferOrLog(session, interaction) {
 		return

@@ -73,3 +73,25 @@ func TestScrapeServerStatus_NonOKStatus(t *testing.T) {
 		t.Fatal("expected an error for a non-200 response, got nil")
 	}
 }
+
+func TestScrapeServerStatus_ZeroWorldsParsedIsAnError(t *testing.T) {
+	// A 200 response whose markup no longer matches our selectors (e.g. Lodestone
+	// redesigned the page) must surface as an error rather than an empty Servers map,
+	// so the monitor preserves its last-known-good snapshot instead of wiping it.
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte("<html><body><p>no matching markup here</p></body></html>")); err != nil {
+			t.Errorf("write response: %v", err)
+		}
+	}))
+	defer server.Close()
+
+	scraper := NewScraper(nil, server.URL)
+
+	servers, err := scraper.Scrape(context.Background())
+	if err == nil {
+		t.Fatal("expected an error when zero worlds are parsed from a 200 response, got nil")
+	}
+	if servers != nil {
+		t.Errorf("expected a nil Servers map on error, got %v", servers)
+	}
+}

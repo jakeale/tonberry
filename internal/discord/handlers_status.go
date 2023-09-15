@@ -13,7 +13,7 @@ func (bot *Bot) handleStatus(
 ) {
 	servers := bot.monitor.Snapshot()
 
-	worldOpt := data.GetOption(optionWorld)
+	worldOpt := optionByName(data.Options, optionWorld)
 	if worldOpt == nil {
 		bot.respondEmbed(session, interaction, statusSummaryEmbed(servers))
 		return
